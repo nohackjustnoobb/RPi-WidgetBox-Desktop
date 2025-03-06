@@ -1,0 +1,12 @@
+{
+  "name": "rpi-widgetbox-desktop",
+  "version": "1.0.0",
+  "license": "MIT",
+  "scripts": {
+    "dev": "cd RPi-WidgetBox-Editor && yarn && yarn dev",
+    "build": "cd RPi-WidgetBox-Editor && yarn && yarn build"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.2.7"
+  }
+}

@@ -18,6 +18,7 @@ pub fn run() {
 
             Ok(())
         })
+        .plugin(tauri_plugin_dialog::init())
         .invoke_handler(generate_handler![register_media_activity_event])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,5 +1,9 @@
+use std::sync::atomic::AtomicBool;
+
 use serde::Serialize;
 use tauri::AppHandle;
+
+static mut REGISTERED: AtomicBool = AtomicBool::new(false);
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -23,6 +27,12 @@ pub fn register_media_activity_event() {
 #[tauri::command]
 #[cfg(target_os = "macos")]
 pub fn register_media_activity_event(app: AppHandle) {
+    let registered = unsafe { REGISTERED.get_mut() };
+    if *registered {
+        return;
+    }
+    *registered = true;
+
     use std::{
         sync::{Arc, Condvar, Mutex},
         thread,

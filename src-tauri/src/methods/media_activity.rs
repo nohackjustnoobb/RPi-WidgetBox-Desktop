@@ -1,9 +1,9 @@
-use std::sync::atomic::AtomicBool;
-
 use serde::Serialize;
 use tauri::AppHandle;
 
-static mut REGISTERED: AtomicBool = AtomicBool::new(false);
+#[cfg(target_os = "macos")]
+static FLAG: once_cell::sync::Lazy<(std::sync::Mutex<bool>, std::sync::Condvar)> =
+    once_cell::sync::Lazy::new(|| (std::sync::Mutex::new(false), std::sync::Condvar::new()));
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -19,30 +19,22 @@ struct MediaActivity {
 }
 
 #[tauri::command]
-#[cfg(not(target_os = "macos"))]
-pub fn register_media_activity_event() {
-    // TODO: implement for other platforms
-}
-
-#[tauri::command]
 #[cfg(target_os = "macos")]
 pub fn register_media_activity_event(app: AppHandle) {
-    let registered = unsafe { REGISTERED.get_mut() };
-    if *registered {
+    let (lock, _) = &*FLAG;
+    let mut flag = lock.lock().unwrap();
+    if *flag {
         return;
     }
-    *registered = true;
+    *flag = true;
 
-    use std::{
-        sync::{Arc, Condvar, Mutex},
-        thread,
-    };
+    use std::thread::spawn;
 
     use crate::utils::image_as_base64;
     use media_remote::NowPlaying;
     use tauri::Emitter;
 
-    thread::spawn(move || {
+    spawn(move || {
         let now_playing = NowPlaying::new();
 
         // forwarding the events
@@ -74,10 +66,31 @@ pub fn register_media_activity_event(app: AppHandle) {
         });
 
         // Blocks forever to keep `now_playing` alive
-        let pair = Arc::new((Mutex::new(()), Condvar::new()));
-        let (lock, cvar) = &*pair;
-
-        let guard = lock.lock().unwrap();
-        let _unused = cvar.wait(guard).unwrap();
+        let (lock, cvar) = &*FLAG;
+        let mut flag = lock.lock().unwrap();
+        while *flag {
+            flag = cvar.wait(flag).unwrap();
+        }
     });
+}
+
+#[tauri::command]
+#[cfg(target_os = "macos")]
+pub fn unregister_media_activity_event() {
+    let (lock, cvar) = &*FLAG;
+    let mut flag = lock.lock().unwrap();
+    *flag = false;
+    cvar.notify_one();
+}
+
+#[tauri::command]
+#[cfg(not(target_os = "macos"))]
+pub fn register_media_activity_event() {
+    // TODO: implement for other platforms
+}
+
+#[tauri::command]
+#[cfg(not(target_os = "macos"))]
+pub fn unregister_media_activity_event() {
+    // TODO: implement for other platforms
 }

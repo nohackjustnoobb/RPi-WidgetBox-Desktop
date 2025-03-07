@@ -104,6 +104,7 @@ dependencies = [
  "image",
  "log",
  "media-remote",
+ "once_cell",
  "serde",
  "serde_json",
  "tauri",

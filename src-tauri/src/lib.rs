@@ -1,7 +1,7 @@
 mod methods;
 mod utils;
 
-use methods::media_activity::register_media_activity_event;
+use methods::media_activity::{register_media_activity_event, unregister_media_activity_event};
 use tauri::generate_handler;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -19,7 +19,10 @@ pub fn run() {
             Ok(())
         })
         .plugin(tauri_plugin_dialog::init())
-        .invoke_handler(generate_handler![register_media_activity_event])
+        .invoke_handler(generate_handler![
+            register_media_activity_event,
+            unregister_media_activity_event
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

@@ -14,19 +14,77 @@ This repository serves as the desktop editor for [RPi-WidgetBox](https://github.
 Retrieves the current system information.
 
 ```typescript
+interface MemoryInfo {
+  total: number;
+  used: number;
+}
+
+interface CPUInfo {
+  usage: number;
+  name: string;
+  brand: string;
+  vendorId: string;
+  frequency: number;
+}
+
 interface SystemInfo {
-  bootTime?: number | null;
-  cpuNum?: number | null;
-  cpuSpeed?: number | null;
-  diskTotal?: number | null;
-  diskFree?: number | null;
-  memoryTotal?: number | null;
-  memoryFree?: number | null;
-  hostname?: string | null;
-  avgLoad?: number | null;
-  osRelease?: string | null;
-  osType?: string | null;
-  procTotal?: number | null;
+  bootTime: number;
+  cpus: CPUInfo[];
+  memory: MemoryInfo;
+  swap: MemoryInfo;
+  hostName?: string | null;
+  osVersion?: string | null;
+  longOsVersion?: string | null;
+  systemName?: string | null;
+  kernelVersion?: string | null;
+  totalProc: number;
+}
+```
+
+### `get_disks_info() -> Vec<DiskInfo>`
+
+Retrieves the current disks information.
+
+```typescript
+interface DiskInfo {
+  kind: string;
+  name?: string | null;
+  fileSystem?: string | null;
+  mountPoint?: string | null;
+  totalSpace: number;
+  availableSpace: number;
+}
+```
+
+### `get_networks_info() -> Vec<NetworkInfo>`
+
+Retrieves the current networks information.
+
+```typescript
+interface NetworkInfo {
+  name: string;
+  totalReceived: number;
+  totalTransmitted: number;
+  totalPacketsReceived: number;
+  totalPacketsTransmitted: number;
+  totalErrorsOnReceived: number;
+  totalErrorsOnTransmitted: number;
+  macAddress: string;
+  ipNetworks: string[];
+  mtu: number;
+}
+```
+
+### `get_components_info() -> Vec<ComponentInfo>`
+
+Retrieves the current component's temperature information.
+
+```typescript
+interface ComponentInfo {
+  label: string;
+  temperature?: number | null;
+  max?: number | null;
+  critical?: number | null;
 }
 ```
 

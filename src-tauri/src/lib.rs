@@ -6,7 +6,7 @@ use methods::{
         next_track, pause_media, play_media, prev_track, register_media_activity_event,
         unregister_media_activity_event,
     },
-    sys_info::get_sys_info,
+    sys_info::{get_components_info, get_disks_info, get_networks_info, get_sys_info},
 };
 use tauri::generate_handler;
 
@@ -32,7 +32,10 @@ pub fn run() {
             pause_media,
             next_track,
             prev_track,
-            get_sys_info
+            get_sys_info,
+            get_disks_info,
+            get_networks_info,
+            get_components_info
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

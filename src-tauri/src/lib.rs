@@ -1,9 +1,12 @@
 mod methods;
 mod utils;
 
-use methods::media_activity::{
-    next_track, pause_media, play_media, prev_track, register_media_activity_event,
-    unregister_media_activity_event,
+use methods::{
+    media_activity::{
+        next_track, pause_media, play_media, prev_track, register_media_activity_event,
+        unregister_media_activity_event,
+    },
+    sys_info::get_sys_info,
 };
 use tauri::generate_handler;
 
@@ -29,6 +32,7 @@ pub fn run() {
             pause_media,
             next_track,
             prev_track,
+            get_sys_info
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
